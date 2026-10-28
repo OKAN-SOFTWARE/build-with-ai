@@ -1456,6 +1456,9 @@ async function runTests() {
     assert(claude.includes('Next.js 14'), 'rules must contain the tech stack');
     assert(claude.includes('PostgreSQL with Prisma'), 'rules must contain the database choice');
     assert(claude.includes('Vercel'), 'rules must contain the hosting decision');
+    assert(claude.includes('- Hosting: Vercel'), 'hosting must appear under Tech stack');
+    assert.strictEqual(claude.split('Vercel').length - 1, 1, 'hosting decision must appear only once');
+    assert(!claude.includes('**Deployment Platform:**'), 'hosting must not repeat under Decisions');
     assert(claude.includes(RULES_BLOCK_START) && claude.includes(RULES_BLOCK_END), 'managed block markers present');
 
     const mdc = fs.readFileSync(path.join(rulesDir, '.cursor', 'rules', 'project-decisions.mdc'), 'utf8');
