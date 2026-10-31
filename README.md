@@ -1,68 +1,57 @@
 # build-with-ai
 
-> A zero-API, local-first CLI that guides developers step-by-step through building complete software projects with any AI by generating deterministic, context-aware prompts at every engineering phase.
-
 <div align="center">
 
-[![CI](https://github.com/PicadoLabs/build-with-ai/actions/workflows/ci.yml/badge.svg)](https://github.com/PicadoLabs/build-with-ai/actions/workflows/ci.yml)
-[![npm version](https://img.shields.io/npm/v/build-with-ai.svg?style=flat&color=3b82f6)](https://www.npmjs.com/package/build-with-ai)
-[![npm downloads](https://img.shields.io/npm/dt/build-with-ai.svg?style=flat&color=10b981&label=downloads)](https://www.npmjs.com/package/build-with-ai)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
-[![Node >= 18](https://img.shields.io/badge/node-%3E%3D18.0.0-f59e0b.svg)](https://nodejs.org)
-[![Zero API Keys](https://img.shields.io/badge/AI_API-None_(100%25_Local)-8b5cf6.svg)](README.md)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+<pre>
+  ____  _   _ ___ _     ____      __        _____ _____ _   _          _    ___ 
+ | __ )| | | |_ _| |   |  _ \     \ \      / /_ _|_   _| | | |        / \  |_ _|
+ |  _ \| | | || || |   | | | |     \ \ /\ / / | |  | | | |_| |       / _ \  | | 
+ | |_) | |_| || || |___| |_| |      \ V  V /  | |  | | |  _  |      / ___ \ | | 
+ |____/ \___/|___|_____|____/        \_/\_/  |___| |_| |_| |_|     /_/   \_\___|
+</pre>
 
-[Quickstart](#quickstart) • [How It Works](#how-it-works) • [Templates](#available-templates) • [Commands](#commands-reference) • [Architecture](#architecture--storage-design) • [Walkthrough](#walkthrough) • [Contributing](CONTRIBUTING.md)
+**Deterministic, context-aware prompt engine for building complete software projects with any AI.**
+
+[![npm version](https://img.shields.io/npm/v/build-with-ai.svg?style=flat-square&color=3b82f6)](https://www.npmjs.com/package/build-with-ai)
+[![npm downloads](https://img.shields.io/npm/dt/build-with-ai.svg?style=flat-square&color=10b981&label=downloads)](https://www.npmjs.com/package/build-with-ai)
+[![CI](https://img.shields.io/github/actions/workflow/status/PicadoLabs/build-with-ai/ci.yml?branch=main&style=flat-square&label=ci)](https://github.com/PicadoLabs/build-with-ai/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg?style=flat-square)](LICENSE)
+[![Node >= 18](https://img.shields.io/badge/node-%3E%3D18.0.0-f59e0b.svg?style=flat-square)](https://nodejs.org)
+[![Zero API Keys](https://img.shields.io/badge/AI_API-None_(100%25_local)-8b5cf6.svg?style=flat-square)](README.md)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+
+```bash
+npx build-with-ai
+```
+
+[Quickstart](#quickstart) &bull; [Workflow](#the-4-step-workflow) &bull; [Templates](#available-templates) &bull; [CLI Reference](#cli-reference) &bull; [Autonomous Mode](#byok-autonomous-mode) &bull; [MCP Server](#model-context-protocol-mcp) &bull; [Contributing](CONTRIBUTING.md)
 
 </div>
 
 ---
 
-## Overview
+## Why build-with-ai?
 
-When building non-trivial applications with AI assistants (Claude, ChatGPT, Cursor, DeepSeek, local Ollama models), developers often encounter three problems:
+Prompting an AI model to "build an entire app" typically breaks down in three ways:
 
-1. **The Blank Canvas Problem:** Asking an AI to "build a whole app" produces monolithic, fragmented code.
-2. **Context Drift:** As the chat progresses, the AI forgets foundational schema and architectural decisions made earlier.
-3. **Skipped Phases:** Jumping directly to UI before establishing data contracts, authentication, or error handling.
+1. **The Blank Canvas Problem**: Monolithic prompts produce hallucinated schemas and unmaintainable code dumps.
+2. **Context Drift**: In long conversations, AI forgets early database designs, auth models, and naming standards.
+3. **Skipped Foundations**: Models jump to frontend polish before data models, contracts, and error handling exist.
 
-`build-with-ai` solves this by breaking projects into disciplined, sequential phases (Discovery, Schema, Auth, Core CRUD, Testing, Deployment). It maintains a local context store (`context.json`) and automatically interpolates prior architectural decisions into downstream prompts (`{{decisions.key}}`).
+`build-with-ai` solves this by breaking application development into structured, sequential engineering phases. It records decisions in a local `context.json` file and automatically injects them into downstream prompts (`{{decisions.key}}`).
 
-### Core Guarantees
-- **Zero API Keys & Zero Cost:** Runs 100% locally in your terminal. No third-party API accounts or rate limits required.
-- **Universal Model Compatibility:** Use with any web interface, IDE plugin, or local model.
-- **Non-Destructive:** Operates entirely within `.buildwithai/` and never touches or overwrites your application source files.
+### Key Principles
 
----
-
-## How It Works
-
-```mermaid
-graph LR
-    subgraph Local Machine
-        CLI[build-with-ai CLI]
-        Store[(.buildwithai/ Memory)]
-        Code[Application Code]
-    end
-
-    subgraph AI Assistant
-        AI[Claude / ChatGPT / Cursor / Local LLM]
-    end
-
-    CLI -->|1. Generate Prompt & Copy| Clipboard[System Clipboard]
-    Clipboard -->|2. Paste Prompt| AI
-    AI -->|3. Produce Code & Design| Developer[Developer]
-    Developer -->|4. Implement| Code
-    Developer -->|5. Record Decisions| CLI
-    CLI -->|6. Save Context| Store
-    Store -->|7. Interpolate Context| CLI
-```
+- **Zero API Keys & Zero Cost**: Runs 100% locally in your terminal. Works out of the box with web UIs (ChatGPT, Claude), IDEs (Cursor, Windsurf), or local LLMs (Ollama).
+- **Universal Compatibility**: Generates tailored prompts for any AI model without vendor lock-in.
+- **Non-Destructive**: State is maintained exclusively inside `.buildwithai/` and never alters your application code unexpectedly.
+- **AI Editor Ready**: Ships with a native Model Context Protocol (MCP) server and automatic editor rules synchronization (`.cursorrules`, `CLAUDE.md`, etc.).
 
 ---
 
 ## Quickstart
 
-Run directly without installation via `npx`:
+Run directly without prior installation:
 
 ```bash
 npx build-with-ai
@@ -74,240 +63,161 @@ Or install globally:
 npm install -g build-with-ai
 ```
 
-Initialize a new project:
+Initialize your workspace:
 
 ```bash
 npx build-with-ai init
+```
+
+---
+
+## The 4-Step Workflow
+
+```mermaid
+graph LR
+    A["1. init"] --> B["2. next"]
+    B --> C["3. AI Implementation"]
+    C --> D["4. done"]
+    D --> B
+    D --> E["5. export"]
+```
+
+### 1. Initialize (`init`)
+Select a technology template, your experience level, and a project summary:
+```bash
+npx build-with-ai init
+```
+
+### 2. Generate Prompt (`next`)
+Formats the active phase requirements, identifies target files, and copies the context-injected prompt to your clipboard:
+```bash
+npx build-with-ai next
+```
+
+### 3. Record Decisions (`done`)
+Paste the prompt into your AI tool, review the generated code, and record architectural decisions:
+```bash
+npx build-with-ai done
+```
+You can also parse decisions directly from the clipboard:
+```bash
+npx build-with-ai done --from-clipboard
+```
+
+### 4. Export & Sync Rules (`export`)
+Export clean Markdown documentation and sync your project decisions across editor rule files:
+```bash
+npx build-with-ai export
+npx build-with-ai export --rules
 ```
 
 ---
 
 ## Available Templates
 
-`build-with-ai` includes 11 production-ready workflow templates:
+`build-with-ai` ships with 11 production-ready workflow templates:
 
-| Template ID | Template Title | Steps | Primary Tech Stack |
+| Template ID | Name | Steps | Core Stack |
 | :--- | :--- | :---: | :--- |
-| `web-app` | **Full-Stack Web Application** | 23 | Next.js / React, Tailwind CSS, Prisma ORM, PostgreSQL |
-| `saas-mvp` | **Modern SaaS MVP** | 15 | Next.js 14 App Router, Supabase, Stripe, Resend Email |
-| `rest-api` | **Backend REST API Service** | 10 | Node.js, Fastify / Express, PostgreSQL, Zod |
-| `fastapi-backend` | **Python FastAPI Microservices** | 12 | Python 3.11+, FastAPI, Pydantic v2, Async SQLAlchemy 2.0, Alembic |
-| `mobile-app` | **Cross-Platform Mobile App** | 15 | React Native, Expo Router, NativeWind, EAS Build |
-| `flutter-app` | **Flutter Mobile Application** | 16 | Flutter 3.x, Dart, Riverpod / BLoC, Clean Architecture |
-| `electron-app` | **Electron Desktop Application** | 12 | Electron, Vite, React, IPC Handlers, electron-builder |
-| `chrome-extension` | **Chrome Browser Extension** | 12 | Manifest V3, Vite, React, Shadow DOM |
-| `ai-agent` | **AI Agent & RAG Pipeline** | 14 | LangChain / LlamaIndex, Vector DB, FastAPI / Express |
-| `ai-orchestration` | **AI Orchestration & Multi-Agent** | 14 | LangGraph / CrewAI, AutoGen, Vector DB, Telemetry |
-| `discord-bot` | **Discord Bot Workflow** | 12 | Node.js, discord.js v14, Slash Commands, SQLite / PostgreSQL |
+| `web-app` | Full-Stack Web Application | 23 | Next.js / React, Tailwind CSS, Prisma, PostgreSQL |
+| `saas-mvp` | Modern SaaS MVP | 15 | Next.js App Router, Supabase, Stripe, Resend |
+| `rest-api` | Backend REST API Service | 10 | Node.js, Fastify / Express, PostgreSQL, Zod |
+| `fastapi-backend` | Python FastAPI Microservices | 12 | Python 3.11+, FastAPI, Pydantic v2, SQLAlchemy 2.0, Alembic |
+| `mobile-app` | Cross-Platform Mobile App | 15 | React Native, Expo Router, NativeWind, EAS Build |
+| `flutter-app` | Flutter Mobile Application | 16 | Flutter 3.x, Dart, Riverpod / BLoC, Clean Architecture |
+| `electron-app` | Electron Desktop Application | 12 | Electron, Vite, React, IPC Handlers, electron-builder |
+| `chrome-extension` | Chrome Browser Extension | 12 | Manifest V3, Vite, React, Shadow DOM |
+| `ai-agent` | AI Agent & RAG Pipeline | 14 | LangChain / LlamaIndex, Vector DB, FastAPI / Express |
+| `ai-orchestration` | Multi-Agent Orchestration | 14 | LangGraph / CrewAI, AutoGen, Vector DB, Telemetry |
+| `discord-bot` | Discord Bot Workflow | 12 | Node.js, discord.js v14, Slash Commands, SQLite / PostgreSQL |
 
-### Custom & Remote Templates
+### Custom and Remote Templates
 
-Load team-specific or custom templates directly from a local path or remote URL:
+Load team-specific or custom templates from a local file or HTTPS URL:
 
 ```bash
-# Local template
+# Local JSON template
 npx build-with-ai init --template ./custom-template.json
 
-# Remote template (HTTPS raw JSON)
+# Remote HTTPS template
 npx build-with-ai init --template https://raw.githubusercontent.com/org/repo/main/template.json
-```
 
-Custom templates are validated against the schema and automatically saved to `.buildwithai/template.json`, ensuring all subsequent commands (`next`, `done`, `status`, `export`) resolve the template offline without needing the original file or URL.
-
-Or discover and initialize with community templates using the remote template registry:
-
-```bash
-# Search all templates in the community registry
-npx build-with-ai search
-
-# Search by keyword
+# Discover community templates
 npx build-with-ai search saas
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the template authoring specification and schema contracts.
+Custom templates are persisted to `.buildwithai/template.json` and work fully offline for all subsequent commands.
 
 ---
 
-## Walkthrough
+## CLI Reference
 
-### 1. Initialize
-```bash
-npx build-with-ai init
-```
-Select a template, experience level, and project overview. The `.buildwithai/` workspace is created.
-
-### 2. Generate Prompt (`next`)
-```bash
-npx build-with-ai next
-```
-The CLI formats the active step, identifies recommended models and target files, and copies the prompt to your clipboard.
-
-```text
-STEP 1/15: Problem Discovery & SaaS Value Proposition
-Phase: Discovery
-Recommended AI: Claude 3.5 Sonnet / GPT-4o
-Target Files: [None]
-
-PROMPT FOR YOUR AI:
-------------------------------------------------------------
-I am building a SaaS product called "Invoice Tracker".
-The concept is: A subscription SaaS for freelancers to automate invoicing.
-My experience level is Intermediate.
-
-Act as a SaaS product strategist:
-1. Define the primary customer persona.
-2. Formulate a 2-sentence value proposition.
-------------------------------------------------------------
-Prompt copied to clipboard.
-```
-
-### 3. Record Decisions (`done`)
-Paste the prompt into your AI assistant, review the architectural output, and record the choices:
-
-```bash
-npx build-with-ai done
-```
-Enter decisions for required keys (e.g., `decisions.targetCustomer`, `decisions.coreValueProp`). Decisions are saved to `context.json`, and the project advances to the next step.
-
-### 4. Automatic Context Injection
-On subsequent steps, previous decisions are automatically injected into the generated prompt:
-
-```text
-STEP 3/15: Technology Stack Selection
-Phase: Tech Stack
-
-PROMPT FOR YOUR AI:
-------------------------------------------------------------
-My experience level is Intermediate and "Invoice Tracker" targets:
-[Injected from Step 1: Freelance designers and agencies]
-
-Recommend the optimal production tech stack...
-------------------------------------------------------------
-```
-
-### 5. Inspect and Modify Decisions (`context`, `set` & `config`)
-View stored decisions or update any value directly using dot-notation:
-
-```bash
-npx build-with-ai context
-npx build-with-ai set decisions.database "PostgreSQL with Prisma"
-```
-
-Or edit decisions interactively — pick a key from a list and type the new value (JSON is parsed automatically):
-
-```bash
-npx build-with-ai config
-```
-
-### 6. Track Progress (`status` & `resume`)
-```bash
-npx build-with-ai status
-```
-
-```text
-PROJECT STATUS: Invoice Tracker
-Template:   Modern SaaS MVP
-Progress:   [============------------] 47% (7/15 steps)
-
-WORKFLOW STEPS:
-  [x] 1. Problem Discovery [Discovery]
-  [x] 2. MVP Feature Scoping [Requirements]
-  [x] 3. Technology Stack Selection [Tech Stack]
-  [x] 4. Database Schema Design [Database]
-  [x] 5. API Routes & Server Actions [API]
-  [x] 6. Authentication Setup [Authentication]
-  [>] 7. Stripe Subscription Integration [Payments] (Current)
-  [ ] 8. Transactional Email Pipeline [Email]
-```
-
-### 7. Export Documentation and Editor Rules (`export`)
-```bash
-npx build-with-ai export
-```
-Generates standardized documentation from your build history:
-- `README.md` — Project architecture and setup guide.
-- `BUILD_LOG.md` — Chronological log of decisions and step history.
-- `.buildwithai/CONTEXT.md` — Markdown projection of recorded state.
-
-Use `--out-dir <path>` to export to a custom directory, `--dry-run` to preview output paths, or `--force` to overwrite an existing `README.md`. Without `--force`, interactive runs ask whether to overwrite, save as `README.ai.md`, or cancel; non-interactive runs preserve `README.md` and write the generated file to `README.ai.md`.
-
-#### Sync Editor Rules (`export --rules`)
-```bash
-npx build-with-ai export --rules
-```
-Synchronizes recorded architectural decisions from `context.json` into editor instruction files across AI coding environments:
-- `.cursorrules` (Cursor legacy)
-- `.cursor/rules/project-decisions.mdc` (Cursor modern MDC format)
-- `.windsurfrules` (Windsurf)
-- `CLAUDE.md` (Claude Code / Anthropic)
-- `.github/copilot-instructions.md` (GitHub Copilot)
-
-Any custom instructions you have added outside the managed `<!-- BUILD-WITH-AI:START -->` block are preserved. Pass `--dry-run` to inspect target rule files without writing to disk.
-
-### 8. Undo and Rollback (`undo`)
-```bash
-npx build-with-ai undo
-```
-Need to revise a prior step? `undo` safely rolls back the step counter to the previous step, restores the prior snapshot of `context.json`, and cleans up the corresponding step history file in `.buildwithai/history/`.
-
----
-
-## Commands Reference
+### Core Workflow
 
 | Command | Description |
 | :--- | :--- |
-| `npx build-with-ai` | Interactive launcher displaying active status or starting initialization. |
-| `npx build-with-ai init` | Start setup wizard (template selection, experience level, project concept). |
-| `npx build-with-ai init --template <path\|url>` | Load a custom template from a local file path or remote HTTPS URL. |
-| `npx build-with-ai next` | Generate and copy the prompt for the current step. |
-| `npx build-with-ai next --no-copy` | Generate the step prompt without accessing the system clipboard. |
-| `npx build-with-ai next --raw` | Output only the raw prompt string for scripting and CLI piping. |
-| `npx build-with-ai next --json` | Output complete step metadata as structured JSON. |
-| `npx build-with-ai next --run [--review]` | BYOK autonomous mode: send prompt to AI provider, write returned files, record decisions, and advance. |
-| `npx build-with-ai done` | Record decisions, archive step logs, and advance to the next step. |
-| `npx build-with-ai done --from-clipboard` | Extract and record decisions directly from the system clipboard using heuristic parsing. |
-| `npx build-with-ai undo` | Roll back the most recent completed step, restore context decisions snapshot, and remove history log. |
-| `npx build-with-ai back` | Step back to the previous step without removing recorded context. |
+| `npx build-with-ai` | Interactive launcher. Shows progress or initiates setup wizard. |
+| `npx build-with-ai init` | Start interactive setup (template, experience, overview). |
+| `npx build-with-ai next` | Generate and copy the current step prompt to the clipboard. |
+| `npx build-with-ai next --run` | BYOK autonomous mode: send prompt directly to AI provider. |
+| `npx build-with-ai done` | Record step decisions, archive step logs, and advance to next step. |
+| `npx build-with-ai undo` | Roll back most recent step, restore context snapshot, and prune history. |
+| `npx build-with-ai back` | Step back to previous step without removing recorded context. |
 | `npx build-with-ai jump [step]` | Navigate directly to a specific step number. |
+
+### Context & Configuration
+
+| Command | Description |
+| :--- | :--- |
+| `npx build-with-ai status` | Display progress bar, completed steps, and active decisions. |
 | `npx build-with-ai context [key]` | Inspect recorded decisions or retrieve a specific dot-notation path. |
-| `npx build-with-ai set <key> <value>` | Update a decision in `context.json` from the command line. |
-| `npx build-with-ai config` | Interactively browse and edit recorded decisions (key picker, JSON values parsed). |
-| `npx build-with-ai status [--json]` | Display project progress bar, step list, and recorded decisions. |
-| `npx build-with-ai history [step] [--json]` | Display archived AI responses and step logs. |
-| `npx build-with-ai resume` | Overview dashboard summarizing active step and next action. |
-| `npx build-with-ai export [--out-dir <dir>]` | Generate `README.md`, `BUILD_LOG.md`, and `CONTEXT.md`. |
-| `npx build-with-ai export --rules [--dry-run]` | Sync recorded decisions to editor rules (`.cursorrules`, `CLAUDE.md`, etc.). |
-| `npx build-with-ai export --force` | Overwrite an existing `README.md` explicitly. |
-| `npx build-with-ai list [-s <query>] [--json]` | List and search available templates with step counts. |
-| `npx build-with-ai search [keyword]` | Search remote community template registry and initialize with one click. |
-| `npx build-with-ai models` | Display active AI model capability mappings and recommended models. |
-| `npx build-with-ai reset` | Remove `.buildwithai/` state while leaving project source code intact. |
-| `npx build-with-ai mcp` | Start a native MCP stdio server exposing the workflow as tools. |
+| `npx build-with-ai set <key> <value>` | Update a decision in `context.json` directly from the CLI. |
+| `npx build-with-ai config` | Interactive key-picker to browse and edit decisions. |
+| `npx build-with-ai history [step]` | Inspect archived AI responses and step logs. |
+| `npx build-with-ai resume` | Summary dashboard displaying active state and recommended next action. |
 
-### Headless & CI Scripting
+### Documentation & Editor Rules
 
-Use `--json` or `--raw` to integrate `build-with-ai` with automated pipelines or editor extensions:
+| Command | Description |
+| :--- | :--- |
+| `npx build-with-ai export` | Generate `README.md`, `BUILD_LOG.md`, and `.buildwithai/CONTEXT.md`. |
+| `npx build-with-ai export --rules` | Sync decisions to `.cursorrules`, `CLAUDE.md`, `.windsurfrules`, and Copilot. |
+| `npx build-with-ai export --force` | Overwrite existing `README.md` without confirmation. |
+| `npx build-with-ai reset` | Clean `.buildwithai/` state while preserving project source code. |
+| `npx build-with-ai mcp` | Launch Model Context Protocol (MCP) stdio server. |
+
+---
+
+## Advanced Capabilities
+
+### BYOK Autonomous Mode
+
+Bring Your Own Key or use local Ollama to bypass copy-pasting. The CLI executes the step prompt, writes returned code files into your workspace, updates `context.json`, and advances the phase:
 
 ```bash
-# Extract prompt using jq (macOS / Linux)
-npx build-with-ai next --json | jq -r '.prompt'
+export OPENAI_API_KEY=sk-...
+npx build-with-ai next --run
 
-# Extract prompt in PowerShell (Windows)
-npx build-with-ai next --json | ConvertFrom-Json | Select-Object -ExpandProperty prompt
+# Preview git-style diffs before files are written
+npx build-with-ai next --run --review
 
-# Disable clipboard globally in headless environments
-export BUILD_WITH_AI_NO_COPY=1
+# Use a local model with Ollama (no API key required)
+npx build-with-ai next --run --provider ollama
 ```
 
-### MCP Server (AI-native editors)
+Supported providers: `openai`, `anthropic`, `gemini`, `deepseek`, `groq`, `together`, `ollama`.
 
-`npx build-with-ai mcp` starts a native [Model Context Protocol](https://modelcontextprotocol.io/) stdio
-server, so editor agents (Cursor, Windsurf, Claude Code) and Claude Desktop can drive the workflow
-directly. Available tools: `get_workflow_status`, `get_active_prompt`, `complete_step`, `get_context`.
-Steps completed through `complete_step` automatically capture a pre-step snapshot so that `undo` can roll them back cleanly.
+### Model Context Protocol (MCP)
 
-```jsonc
-// Cursor: .cursor/mcp.json — Claude Desktop: claude_desktop_config.json ("mcpServers")
+Start a native stdio MCP server to let AI coding tools drive the workflow:
+
+```bash
+npx build-with-ai mcp
+```
+
+Add to your editor configuration (`.cursor/mcp.json` or `claude_desktop_config.json`):
+
+```json
 {
   "mcpServers": {
     "build-with-ai": {
@@ -319,85 +229,73 @@ Steps completed through `complete_step` automatically capture a pre-step snapsho
 }
 ```
 
-### BYOK Autonomous Mode (`next --run`)
+Exposed tools: `get_workflow_status`, `get_active_prompt`, `complete_step`, and `get_context`. Steps completed via MCP automatically create safe rollback snapshots.
 
-Bring your own API key (or a local LLM) and skip the copy/paste round-trip: `next --run`
-sends the step prompt to the model, writes the returned file blocks into your project, records
-decisions into `context.json`, saves the raw response to history, and advances the step. Add
-`--review` to see a colored diff of every proposed change and confirm before it is applied.
+### Editor Rules Synchronization
+
+Keep your AI coding assistant anchored to the project's architectural decisions:
 
 ```bash
-export OPENAI_API_KEY=sk-...                       # or ANTHROPIC_API_KEY / GEMINI_API_KEY / ...
-npx build-with-ai next --run                        # autonomous step via OpenAI
-npx build-with-ai next --run --review               # preview the diff first
-npx build-with-ai next --run --provider anthropic   # pick a provider explicitly
-npx build-with-ai next --run --provider ollama     # local model, no key needed
+npx build-with-ai export --rules
 ```
 
-Supported providers: `openai`, `deepseek`, `groq`, `together`, `ollama` (local,
-`http://localhost:11434/v1`), `anthropic`, `gemini`, `jev`. Keys resolve in this order:
-`--api-key` flag → `<PROVIDER>_API_KEY` environment variable → `.buildwithai/.env`
-(gitignored automatically on `init`). Override the model or endpoint per provider with
-`<PROVIDER>_MODEL` / `<PROVIDER>_BASE_URL` (or `--model` / `--base-url`). The client is
-zero-dependency (native Node `fetch`) and the default clipboard workflow is unchanged when
-`--run` is not passed.
----
+Updates:
+- `.cursorrules` and `.cursor/rules/project-decisions.mdc`
+- `.windsurfrules`
+- `CLAUDE.md`
+- `.github/copilot-instructions.md`
 
-## Architecture & Storage Design
+All user instructions outside the managed `<!-- BUILD-WITH-AI:START -->` block are preserved.
 
-All metadata and state are stored in a self-contained `.buildwithai/` directory within your project root:
+### Branch-Scoped Storage
 
-```text
-my-project/
-├── .buildwithai/
-│   ├── state.json        # Progress tracking (currentStep, completedSteps, timestamps)
-│   ├── context.json      # Structured decisions store (single source of truth)
-│   ├── template.json     # Persisted custom template (when initialized via --template)
-│   ├── snapshots/        # Step snapshots enabling safe `undo` and rollback
-│   ├── CONTEXT.md        # Formatted markdown view of context.json
-│   └── history/          # Archived step responses (step-01.md, step-02.md, ...)
-├── src/                  # User application code (never touched by the CLI)
-├── README.md             # Generated on export
-└── BUILD_LOG.md          # Generated on export
-```
-
-### Branch-scoped storage (multi-branch workflows)
-
-By default, all git branches share the single `.buildwithai/` directory. Set `BUILD_WITH_AI_BRANCH_SCOPED=1`
-to isolate state per branch:
+To isolate state across git branches, enable branch scoping:
 
 ```bash
 export BUILD_WITH_AI_BRANCH_SCOPED=1
 ```
 
-When enabled, the CLI detects the current git branch and stores that branch's `state.json`, `context.json`
-and `history/` under `.buildwithai/branches/<branch-name>/` instead. Branch names are sanitized into a
-single safe directory segment (e.g. `feature/auth` becomes `feature-auth`), so they can never escape the
-`branches/` directory. When git is unavailable, the directory is not a git repository, or HEAD is detached,
-the CLI falls back to the default shared `.buildwithai/` storage. `reset` only clears the current branch's
-storage; other branches are left untouched.
+State is isolated under `.buildwithai/branches/<branch-name>/`, ensuring feature branches do not collide.
+
+---
+
+## Storage Architecture
+
+All state is self-contained inside your project's `.buildwithai/` directory:
+
+```text
+my-project/
+├── .buildwithai/
+│   ├── state.json        # Progress tracking and current step pointer
+│   ├── context.json      # Structured architectural decisions (single source of truth)
+│   ├── template.json     # Persisted template (for offline execution)
+│   ├── snapshots/        # Step snapshots for non-destructive undo/rollback
+│   ├── CONTEXT.md        # Formatted markdown view of decisions
+│   └── history/          # Historical step responses (step-01.md, step-02.md, ...)
+├── src/                  # User application code (never touched by CLI)
+├── README.md             # Generated on export
+└── BUILD_LOG.md          # Generated on export
+```
 
 ---
 
 ## Contributing
 
-Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on code style, template schema requirements, and pull request procedures.
+Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on development setup, template specifications, and pull request guidelines.
 
-Please also review our [Code of Conduct](CODE_OF_CONDUCT.md).
+Please review our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
 ## Security
 
-If you discover a security vulnerability, please review our [Security Policy](SECURITY.md) and report it privately to [picadolabs@gmail.com](mailto:picadolabs@gmail.com).
+To report security vulnerabilities, consult our [Security Policy](SECURITY.md) or contact [picadolabs@gmail.com](mailto:picadolabs@gmail.com).
 
 ---
 
-## Maintainers
+## Maintainer
 
-`build-with-ai` is maintained by [PicadoLabs](https://picadolabs.me).
-
-- **Maintainer:** [Kaap10](https://github.com/Kaap10)
+- **Maintainer:** [Vardhman Gupta](https://github.com/Kaap10)
 - **Organization:** [PicadoLabs](https://github.com/PicadoLabs)
 - **Contact:** [picadolabs@gmail.com](mailto:picadolabs@gmail.com)
 
@@ -405,6 +303,6 @@ If you discover a security vulnerability, please review our [Security Policy](SE
 
 ## License
 
-This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
+Licensed under the [Apache License 2.0](LICENSE).
 
-Copyright (c) 2026 PicadoLabs.
+Copyright &copy; 2026 [PicadoLabs](https://picadolabs.me).
