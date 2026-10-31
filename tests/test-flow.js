@@ -2717,13 +2717,9 @@ async function runTests() {
     ].join('\n');
     const responseBody = JSON.stringify({ choices: [{ message: { content: decisionReply } }] });
     const preload = path.join(autonomousDir, 'mock-ai.js');
-    fs.writeFileSync(
-      preload,
-      'globalThis.fetch = async () => ({ ok: true, text: async () => ' +
-        JSON.stringify(responseBody) +
-        ' });\n',
-      'utf8'
-    );
+    const mockFetchBody = JSON.stringify(responseBody);
+    const mockFetchSource = `globalThis.fetch = async () => ({ ok: true, text: async () => ${mockFetchBody} });\n`;
+    fs.writeFileSync(preload, mockFetchSource, 'utf8');
     const execution = require('child_process').spawnSync(
       process.execPath,
       ['--require', preload, path.join(__dirname, '..', 'bin', 'cli.js'), 'next', '--run', '--provider', 'ollama'],
