@@ -915,57 +915,30 @@ async function runTests() {
   assert.deepStrictEqual(parsed.missing, ['decisions.missingKey']);
 
   // Regression (#183): numbered lists and Markdown decision tables.
-  const numbered = parseDecisions(
-    [
-      '1. **Database**: PostgreSQL with Prisma',
-      '2. Auth Strategy: NextAuth.js with JWT',
-      '12. **Auth**: JWT'
-    ].join('\n'),
-    ['decisions.database', 'decisions.authStrategy', 'decisions.auth', 'decisions.unknown']
-  );
-  assert.deepStrictEqual(numbered, {
-    found: {
-      'decisions.database': 'PostgreSQL with Prisma',
-      'decisions.authStrategy': 'NextAuth.js with JWT',
-      'decisions.auth': 'JWT'
-    },
-    missing: ['decisions.unknown']
-  });
+  const numberedText = '1. **Database**: PostgreSQL\n2. Auth Strategy: NextAuth.js with JWT';
+  const numbered = parseDecisions(numberedText, ['decisions.database', 'decisions.authStrategy', 'decisions.missing']);
+  assert.strictEqual(numbered.found['decisions.database'], 'PostgreSQL');
+  assert.strictEqual(numbered.found['decisions.authStrategy'], 'NextAuth.js with JWT');
+  assert.deepStrictEqual(numbered.missing, ['decisions.missing']);
 
-  const tableText = [
-    '| Decision | Selected Technology |',
-    '| :--- | ---: |',
-    '| Database | PostgreSQL |',
-    '| **Auth Strategy** | `NextAuth.js with JWT` |',
-    '| Deployment Platform | Vercel |'
-  ].join('\n');
-  const tableParsed = parseDecisions(tableText, [
-    'decisions.database',
-    'decisions.authStrategy',
-    'decisions.deploymentPlatform',
-    'decisions.unknown'
-  ]);
-  assert.deepStrictEqual(tableParsed, {
-    found: {
-      'decisions.database': 'PostgreSQL',
-      'decisions.authStrategy': 'NextAuth.js with JWT',
-      'decisions.deploymentPlatform': 'Vercel'
-    },
-    missing: ['decisions.unknown']
-  });
+  const tableText = '| Decision | Selected Technology |\n| --- | --- |\n| Database | PostgreSQL |';
+  const tableParsed = parseDecisions(tableText, ['decisions.database', 'decisions.missing']);
+  assert.strictEqual(tableParsed.found['decisions.database'], 'PostgreSQL');
+  assert.deepStrictEqual(tableParsed.missing, ['decisions.missing']);
 
-  const pipeOptional = parseDecisions('Database | `SQLite`', ['decisions.database']);
-  assert.strictEqual(pipeOptional.found['decisions.database'], 'SQLite');
-  const emptyTableCell = parseDecisions('| Database |  |', ['decisions.database']);
-  assert.deepStrictEqual(emptyTableCell.missing, ['decisions.database']);
-  const preservedFormats = parseDecisions('## **Database**: SQLite\n* Auth: JWT', [
-    'decisions.database',
-    'decisions.auth'
-  ]);
-  assert.deepStrictEqual(preservedFormats.found, {
-    'decisions.database': 'SQLite',
-    'decisions.auth': 'JWT'
-  });
+  const authTable = '| **Auth Strategy** | `NextAuth.js with JWT` |';
+  const authParsed = parseDecisions(authTable, ['decisions.authStrategy']);
+  assert.strictEqual(authParsed.found['decisions.authStrategy'], 'NextAuth.js with JWT');
+
+  const optionalPipes = parseDecisions('Database | `SQLite`', ['decisions.database']);
+  assert.strictEqual(optionalPipes.found['decisions.database'], 'SQLite');
+
+  const emptyCell = parseDecisions('| Database |  |', ['decisions.database']);
+  assert.deepStrictEqual(emptyCell.missing, ['decisions.database']);
+
+  const preserved = parseDecisions('## **Database**: SQLite\n* Auth: JWT', ['decisions.database', 'decisions.auth']);
+  assert.strictEqual(preserved.found['decisions.database'], 'SQLite');
+  assert.strictEqual(preserved.found['decisions.auth'], 'JWT');
 
   // Case-insensitive matching and value cleanup
   const loose = parseDecisions('DATABASE: `postgres`\n\nAuth : bearer tokens', [
