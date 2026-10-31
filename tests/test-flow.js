@@ -914,10 +914,13 @@ async function runTests() {
   });
   assert.deepStrictEqual(parsed.missing, ['decisions.missingKey']);
 
-
   // Regression (#183): numbered lists and Markdown decision tables.
   const numbered = parseDecisions(
-    ['1. **Database**: PostgreSQL with Prisma', '2. Auth Strategy: NextAuth.js with JWT', '12. **Auth**: JWT'].join('\n'),
+    [
+      '1. **Database**: PostgreSQL with Prisma',
+      '2. Auth Strategy: NextAuth.js with JWT',
+      '12. **Auth**: JWT'
+    ].join('\n'),
     ['decisions.database', 'decisions.authStrategy', 'decisions.auth', 'decisions.unknown']
   );
   assert.deepStrictEqual(numbered, {
