@@ -1132,6 +1132,21 @@ async function runTests() {
   const objectContract = buildArchitecturalContract({ decisions: { auth: { provider: 'Auth0', mfa: true } } });
   assert(objectContract.includes('- Authentication:'), 'Object decision is anchored');
   assert(objectContract.includes('"provider":"Auth0"'), 'Object decision renders as JSON');
+  // Regression (#190): canonical object decisions must not repeat their flattened leaf keys.
+  const nestedContract = buildArchitecturalContract({
+    decisions: {
+      database: { name: 'PostgreSQL', orm: 'Prisma' },
+      auth: { provider: 'Auth0', mfa: true },
+      cache: { provider: 'Redis', ttl: 3600 }
+    }
+  });
+  const nestedLines = nestedContract.split('\n');
+  assert(nestedLines.includes('- Database / ORM: {"name":"PostgreSQL","orm":"Prisma"}'));
+  assert(nestedLines.includes('- Authentication: {"provider":"Auth0","mfa":true}'));
+  assert(!nestedLines.some((line) => line.startsWith('- Database.')), 'Database leaves must not be repeated');
+  assert(!nestedLines.some((line) => line.startsWith('- Auth.')), 'Authentication leaves must not be repeated');
+  assert(nestedLines.includes('- Cache.provider: Redis'), 'Unanchored nested decisions remain visible');
+  assert(nestedLines.includes('- Cache.ttl: 3600'), 'Other nested leaves remain visible');
   console.log('  ✔ Architectural contract anchoring verified.');
 
   // Test 9: `back` Command Logic
