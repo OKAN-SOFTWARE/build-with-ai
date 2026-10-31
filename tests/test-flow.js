@@ -958,10 +958,10 @@ async function runTests() {
   assert.strictEqual(pipeOptional.found['decisions.database'], 'SQLite');
   const emptyTableCell = parseDecisions('| Database |  |', ['decisions.database']);
   assert.deepStrictEqual(emptyTableCell.missing, ['decisions.database']);
-  const preservedFormats = parseDecisions(
-    '## **Database**: SQLite\n* Auth: JWT',
-    ['decisions.database', 'decisions.auth']
-  );
+  const preservedFormats = parseDecisions('## **Database**: SQLite\n* Auth: JWT', [
+    'decisions.database',
+    'decisions.auth'
+  ]);
   assert.deepStrictEqual(preservedFormats.found, {
     'decisions.database': 'SQLite',
     'decisions.auth': 'JWT'
