@@ -43,10 +43,11 @@ const { getByPath, setByPath, flattenObject } = require('../lib/contextBuilder')
 
 const { parseEditorValue, formatEditorValue, summarizeValue, runConfigEditor } = require('../lib/configEditor');
 
-const { runExport, resolveReadmePath } = require('../lib/export');
+const { runExport, generateReadme, resolveReadmePath } = require('../lib/export');
 
 const {
   runRulesExport,
+  generateRulesContent,
   mergeRulesFile,
   getRuleFilePaths,
   RULES_BLOCK_START,
